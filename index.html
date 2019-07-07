@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+<head>
+	<meta charset="UTF-8"></meta>
+	<title>漢字 Counter</title>
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+	<style>
+html {
+	font-size: 24pt;
+	width: 100%;
+	height: 100%;
+}
+body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+span, i {
+	cursor: pointer;
+}
+button {
+	background: #FFF;
+	border-radius: 5px;
+	border: 2px solid #000;
+	margin: 2px;
+	margin-bottom: 6px;
+}
+button.active {
+	color: #FFF;
+	background: #000;
+}
+#app {
+	height: 80%;
+	flex: 1;
+}
+.flex { display: flex; }
+.vertical { flex-direction: column; }
+.horizontal { flex-direction: row; }
+.mainCenter { justify-content: center; }
+.subCenter { align-items: center; }
+.center { justify-content: center; align-items: center;  }
+	</style>
+</head>
+<body>
+	<div id="app" class="flex vertical center">
+		<div class="flex horizontal center">
+			<div class="flex vertical center">
+				<span onclick="addLevel(0)">+</span>
+				<button onclick="tickBox(0)" v-bind:class="{ active: levels[0] }">N5</button>
+				<span onclick="subLevel(0)">-</span>
+			</div>
+			<div class="flex vertical center">
+				<span onclick="addLevel(1)">+</span>
+				<button onclick="tickBox(1)" v-bind:class="{ active: levels[1] }">N4</button>
+				<span onclick="subLevel(1)">-</span>
+			</div>
+			<div class="flex vertical center">
+				<span onclick="addLevel(2)">+</span>
+				<button onclick="tickBox(2)" v-bind:class="{ active: levels[2] }">N3</button>
+				<span onclick="subLevel(2)">-</span>
+			</div>
+			<div class="flex vertical center">
+				<span onclick="addLevel(3)">+</span>
+				<button onclick="tickBox(3)" v-bind:class="{ active: levels[3] }">N2</button>
+				<span onclick="subLevel(3)">-</span>
+			</div>
+			<div class="flex vertical center">
+				<span onclick="addLevel(4)">+</span>
+				<button onclick="tickBox(4)" v-bind:class="{ active: levels[4] }">N1</button>
+				<span onclick="subLevel(4)">-</span>
+			</div>
+		</div>
+		<div class="flex horizontal center">
+			<i class="material-icons" onclick="app.green++; app.blue--;" style="font-size: 32px;">arrow_upward</i>
+			<div class="flex vertical center">
+				<div style="color: #196909">
+					<span onclick="app.green--;"> - </span> (( green )) <span onclick="app.green++;"> + </span>
+				</div>
+				<div style="color: #4543b6">
+					<span onclick="app.blue--;"> - </span> (( blue )) <span onclick="app.blue++;"> + </span>
+				</div>
+			</div>
+			<i class="material-icons" onclick="app.green--; app.blue++;" style="font-size: 32px;">arrow_downward</i>
+		</div>
+		<div>
+			Total: (( total ))
+		</div>
+	</div>
+
+	<script>
+
+var jlptLevels = [ 80, 167, 370, 368, 1232 ];
+
+var app = new Vue({
+	el: "#app",
+	data: {
+		green: 645,
+		blue: 87,
+		levels: [false, false, false, false, false]
+	},
+	computed: {
+		total: function() {
+			var t = this.green + this.blue;
+			for (var i = 0; i < 5; i++) {
+				t += this.levels[i] ? jlptLevels[i] : 0;
+			}
+			return t;
+		}
+	},
+	watch: {
+		'green': function(newVal, oldVal) {
+			localStorage.setItem('green', newVal);
+		},
+		'blue': function(newVal, oldVal) {
+			localStorage.setItem('blue', newVal);
+		},
+		'levels': function(newVal, oldVal) {
+			localStorage.setItem('levels', JSON.stringify(newVal));
+		}
+	},
+	delimiters: ['((', '))']
+});
+
+app.green = parseInt(localStorage.getItem('green')) || app.green;
+app.blue = parseInt(localStorage.getItem('blue')) || app.blue;
+app.levels = JSON.parse(localStorage.getItem('levels')) || app.levels;
+
+window.addEventListener('keydown', e => {
+	if (e.code === 'KeyG') {
+		if (e.shiftKey) app.green--;
+		else app.green++;
+	}
+	if (e.code === 'KeyB') {
+		if (e.shiftKey) app.blue--;
+		else app.blue++;
+	}
+	if (e.code === 'Digit5') Vue.set(app.levels, 4, !app.levels[4]);
+	if (e.code === 'Digit4') Vue.set(app.levels, 3, !app.levels[3]);
+	if (e.code === 'Digit3') Vue.set(app.levels, 2, !app.levels[2]);
+	if (e.code === 'Digit2') Vue.set(app.levels, 1, !app.levels[1]);
+	if (e.code === 'Digit1') Vue.set(app.levels, 0, !app.levels[0]);
+});
+
+function tickBox(level) {
+	Vue.set(app.levels, level, !app.levels[level]);
+}
+
+function addLevel(level) {
+	app.green += jlptLevels[level];
+	Vue.set(app.levels, level, false);
+}
+function subLevel(level) {
+	app.green -= jlptLevels[level];
+	Vue.set(app.levels, level, true);
+}
+
+	</script>
+</body>
+</html>
