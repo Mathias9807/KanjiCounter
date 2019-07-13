@@ -143,6 +143,10 @@ window.addEventListener('keydown', e => {
 	if (e.code === 'Digit1') Vue.set(app.levels, 0, !app.levels[0]);
 });
 
+document.addEventListener('mousedown', e => {
+	if (e.target.onclick !== null) e.preventDefault();
+});
+
 function tickBox(level) {
 	Vue.set(app.levels, level, !app.levels[level]);
 }
