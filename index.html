@@ -71,6 +71,11 @@ button.active {
 				<button onclick="tickBox(4)" v-bind:class="{ active: levels[4] }">N1</button>
 				<span onclick="subLevel(4)">-</span>
 			</div>
+			<div class="flex vertical center">
+				<span onclick="app.rtk++">+</span>
+				<span style="font-size: 18pt">((rtk))</span>
+				<span onclick="app.rtk--">-</span>
+			</div>
 		</div>
 		<div class="flex horizontal center">
 			<i class="material-icons" onclick="app.green++; app.blue--;" style="font-size: 32px;">arrow_upward</i>
@@ -98,11 +103,12 @@ var app = new Vue({
 	data: {
 		green: 645,
 		blue: 87,
-		levels: [false, false, false, false, false]
+		levels: [false, false, false, false, false],
+		rtk: 0
 	},
 	computed: {
 		total: function() {
-			var t = this.green + this.blue;
+			var t = this.green + this.blue + this.rtk * 200;
 			for (var i = 0; i < 5; i++) {
 				t += this.levels[i] ? jlptLevels[i] : 0;
 			}
@@ -118,6 +124,9 @@ var app = new Vue({
 		},
 		'levels': function(newVal, oldVal) {
 			localStorage.setItem('levels', JSON.stringify(newVal));
+		},
+		'rtk': function(newVal, oldVal) {
+			localStorage.setItem('rtk', newVal);
 		}
 	},
 	delimiters: ['((', '))']
@@ -126,6 +135,7 @@ var app = new Vue({
 app.green = parseInt(localStorage.getItem('green')) || app.green;
 app.blue = parseInt(localStorage.getItem('blue')) || app.blue;
 app.levels = JSON.parse(localStorage.getItem('levels')) || app.levels;
+app.rtk = parseInt(localStorage.getItem('rtk')) || app.rtk;
 
 window.addEventListener('keydown', e => {
 	if (e.code === 'KeyG') {
